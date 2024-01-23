@@ -9,3 +9,15 @@ Implementation of Colorful Image Colorization by Richard Zhang.
 - [ ] [Time0o/colorful-colorization](https://github.com/Time0o/colorful-colorization)
 - [ ] [gitliber/image-colorization](https://github.com/gitliber/image-colorization)
 - [ ] [kalpeshdusane/Automatic-Image-Colorization](https://github.com/kalpeshdusane/Automatic-Image-Colorization)
+
+## Example
+Create **exp01** folder:
+```
+!python demo_release.py -i dog_gray.jpeg -o exp01/dog
+```
+
+```
+exp01:
+  dog_eccv16.png
+  dog_siggraph17.png
+```
