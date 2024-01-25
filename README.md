@@ -10,6 +10,7 @@ Implementation of Colorful Image Colorization by Richard Zhang.
 - [ ] https://github.com/yasamanhbn/Image-Colorization
 - [ ] https://github.com/luxiya01/deep-coloring
 - [ ] https://github.com/dtpreda/colorful
+- [ ] https://github.com/Time0o/colorful-colorization
 
 ## Example
 Create **exp01** folder:
