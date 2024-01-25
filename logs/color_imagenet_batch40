@@ -1,0 +1,12 @@
+2024-01-25 18:17:53,627 INFO     ['train.py']
+2024-01-25 18:17:53,627 INFO     Namespace(gpu='1', num_epoch=15, num_workers=4, lr=3e-05, batch_size=40, size=256, crop_size=224, data_root='cifar_images', dataset='imagenet', save_step=1000, resume='', pretrain='', print_freq=100, savename='color_imagenet_batch40', seed=42, test=False, eval=False)
+2024-01-25 18:19:10,955 INFO     ['train.py']
+2024-01-25 18:19:10,955 INFO     Namespace(gpu='1', num_epoch=15, num_workers=4, lr=3e-05, batch_size=40, size=256, crop_size=224, data_root='cifar_images', dataset='imagenet', save_step=1000, resume='', pretrain='', print_freq=100, savename='color_imagenet_batch40', seed=42, test=False, eval=False)
+2024-01-25 19:02:37,520 INFO     ['train.py']
+2024-01-25 19:02:37,521 INFO     Namespace(gpu='1', num_epoch=15, num_workers=4, lr=3e-05, batch_size=40, size=256, crop_size=224, data_root='cifar_images', dataset='imagenet', save_step=1000, resume='', pretrain='', print_freq=100, savename='color_imagenet_batch40', seed=42, test=False, eval=False)
+2024-01-25 19:03:50,678 INFO     ['train.py']
+2024-01-25 19:03:50,678 INFO     Namespace(gpu='1', num_epoch=15, num_workers=2, lr=3e-05, batch_size=40, size=256, crop_size=224, data_root='cifar_images', dataset='imagenet', save_step=1000, resume='', pretrain='', print_freq=100, savename='color_imagenet_batch40', seed=42, test=False, eval=False)
+2024-01-25 19:04:12,507 INFO     ['train.py']
+2024-01-25 19:04:12,507 INFO     Namespace(gpu='1', num_epoch=15, num_workers=2, lr=3e-05, batch_size=40, size=256, crop_size=224, data_root='cifar_images', dataset='imagenet', save_step=1000, resume='', pretrain='', print_freq=100, savename='color_imagenet_batch40', seed=42, test=False, eval=False)
+2024-01-25 19:05:20,444 INFO     ['train.py']
+2024-01-25 19:05:20,444 INFO     Namespace(gpu='1', num_epoch=15, num_workers=2, lr=3e-05, batch_size=40, size=256, crop_size=224, data_root='cifar_images', dataset='imagenet', save_step=1000, resume='', pretrain='', print_freq=100, savename='color_imagenet_batch40', seed=42, test=False, eval=False)
