@@ -6,6 +6,10 @@ Implementation of Colorful Image Colorization by Richard Zhang.
 ## Reference
 - [ ] https://github.com/sizhky/Colorization
 - [ ] https://github.com/nku-shengzheliu/Pytorch-Colorful-Image-Colorization
+- [ ] https://github.com/87003697/colorful_image_colorization_pytorch
+- [ ] https://github.com/yasamanhbn/Image-Colorization
+- [ ] https://github.com/luxiya01/deep-coloring
+- [ ] https://github.com/dtpreda/colorful
 
 ## Example
 Create **exp01** folder:
