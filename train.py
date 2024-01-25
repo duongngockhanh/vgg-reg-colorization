@@ -30,7 +30,7 @@ from utils.checkpoint import save_checkpoint, load_pretrain, load_resume
 def main():
     parser = argparse.ArgumentParser(description='Colorization!')
     ## Optimizer
-    parser.add_argument('--gpu', default='1', help='gpu id')
+    parser.add_argument('--gpu', default='0', help='gpu id')
     parser.add_argument('--num_epoch', default=15, type=int, help='training epoch')
     parser.add_argument('--num_workers', default=2, type=int, help='num workers for data loading')
     parser.add_argument('--lr', default=3e-5, type=float, help='learning rate')
@@ -38,7 +38,7 @@ def main():
     ## Dataset
     parser.add_argument('--size', default=256, type=int, help='image size')
     parser.add_argument('--crop_size', default = 224, type = int, help = 'size for randomly cropping images')
-    parser.add_argument('--data_root', type=str, default='cifar_images',
+    parser.add_argument('--data_root', type=str, default='cifar_images_rs',
                         help='path to dataset splits data folder')
     parser.add_argument('--dataset', default='imagenet', type=str,)
     ## Checkpoint
@@ -137,7 +137,7 @@ def main():
         pass
     else:
         step = 0
-        for epoch in range(args.nb_epoch):
+        for epoch in range(args.num_epoch):
             #--------------------------------------------------------
             batch_time = AverageMeter()
             losses = AverageMeter()

@@ -3,7 +3,10 @@ from PIL import Image
 import os
 
 # Load CIFAR-10 dataset
-transform = transforms.ToTensor()
+transform = transforms.Compose([
+    transforms.Resize((256, 256)),
+    transforms.ToTensor(),
+])
 cifar_dataset = datasets.CIFAR10(root='./data', train=True, download=True, transform=transform)
 
 # Create a directory to save the images
