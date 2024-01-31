@@ -19,7 +19,7 @@ Not mode of the predicted distribution for each pixel, not its mean, but its ann
 
 <img src="assets/e3_annealed_mean.png" alt="e3_annealed_mean.png">
 
-<img src="assets/a4_results.png" alt="a4_results.png">
+<img src="assets/e4_results.png" alt="e4_results.png">
 
 
 ## Dataset
