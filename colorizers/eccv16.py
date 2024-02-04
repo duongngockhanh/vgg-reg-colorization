@@ -1,3 +1,4 @@
+
 import torch
 import torch.nn as nn
 import numpy as np
@@ -96,11 +97,9 @@ class ECCVGenerator(BaseColor):
 
         return self.unnormalize_ab(self.upsample4(out_reg))
 
-if __name__=="__main__":
-    model = ECCVGenerator()
-    x = torch.randn([40, 1, 224, 224])*100
-    model_path = 'saved_models/eccv16/colorization_release_v2-9b330a0b.pth'
-    model.load_state_dict(torch.load(model_path))
-    print('load success')
-    torch.onnx.export(model, x, "saved_models/eccv16/original.onnx",verbose=True)
-    # x2paddle --framework=onnx --model=saved_models/eccv16/original.onnx --save_dir='saved_models/eccv16'
+def eccv16(pretrained=True):
+	model = ECCVGenerator()
+	if(pretrained):
+		import torch.utils.model_zoo as model_zoo
+		model.load_state_dict(model_zoo.load_url('https://colorizers.s3.us-east-2.amazonaws.com/colorization_release_v2-9b330a0b.pth',map_location='cpu',check_hash=True))
+	return model
