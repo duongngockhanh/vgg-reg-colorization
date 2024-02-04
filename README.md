@@ -21,10 +21,6 @@ Not mode of the predicted distribution for each pixel, not its mean, but its ann
 
 <img src="assets/e4_results.png" alt="e4_results.png">
 
-
-## Dataset
-- ImageNet from Kaggle: [link](https://towardsdatascience.com/downloading-and-using-the-imagenet-dataset-with-pytorch-f0908437c4be).
-
 ## Reference
 - [ ] https://github.com/sizhky/Colorization
 - [x] https://github.com/nku-shengzheliu/Pytorch-Colorful-Image-Colorization
@@ -34,14 +30,3 @@ Not mode of the predicted distribution for each pixel, not its mean, but its ann
 - [ ] https://github.com/dtpreda/colorful
 - [ ] https://github.com/stanleynguyen/corolization
 
-## Inference example
-Create **exp01** folder:
-```
-!python demo_release.py -i dog_gray.jpeg -o exp01/dog
-```
-
-```
-exp01:
-  dog_eccv16.png
-  dog_siggraph17.png
-```
