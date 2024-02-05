@@ -3,33 +3,8 @@ import torch
 import matplotlib.pyplot as plt
 from colorizers import *
 from dataloaders import *
-from torchsummary import summary
 
 
-
-## --------------- Default ---------------
-train_in_path = "small-coco-stuff/train2017/train2017"
-val_in_path = "small-coco-stuff/train2017/train2017"
-
-train_batch_size = 16
-val_batch_size = 16
-
-train_loader = create_dataloader(train_in_path, batch_size=train_batch_size, shuffle=True)
-val_loader = create_dataloader(val_in_path, batch_size=val_batch_size,shuffle=False)
-
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-model = ECCV_Regression().to(device)
-# summary(model, (1, 256, 256))
-
-lr = 1e-3
-epochs = 50
-
-criterion = nn.MSELoss()
-optimizer = torch.optim.Adam(model.parameters(), lr=lr)
-
-
-
-## --------------- Addition ---------------
 def evaluate(model, dataloader, criterion, device):
     model.eval()
     losses = []
@@ -43,8 +18,7 @@ def evaluate(model, dataloader, criterion, device):
     return loss
 
 
-def fit(model, train_loader, val_loader, criterion, optimizer, device, epochs, wandb_api):
-    wandb.login(key=wandb_api)
+def fit(model, train_loader, val_loader, criterion, optimizer, device, epochs, lr, train_batch_size):
     wandb.init(
         project="zhang-train-reg",
         config={
@@ -71,7 +45,6 @@ def fit(model, train_loader, val_loader, criterion, optimizer, device, epochs, w
             loss.backward()
             optimizer.step()
             batch_train_losses.append(loss.item())
-            wandb.log({"batch_train_loss": loss})
             if train_batch_size * len(batch_train_losses) > 10000:
                 break
 
@@ -80,9 +53,51 @@ def fit(model, train_loader, val_loader, criterion, optimizer, device, epochs, w
 
         val_loss = evaluate(model, val_loader, criterion, device)
         val_losses.append(val_loss)
-        
-        wandb.log({"train_loss": train_loss, "val_loss": val_loss})
+
+        # Show image
+        val_iter = iter(val_loader)
+        val_first = next(val_iter)
+        showed_in = val_first[0][:1]
+        showed_pred = model(showed_in)
+        showed_res = postprocess_tens(showed_in, showed_pred)
+        showed_res = Image.fromarray(showed_res)
+        image = wandb.Image(showed_res, caption=f"epoch {epoch}")
+
+        wandb.log({"train_loss": train_loss, "val_loss": val_loss, "image": image})
 
         print(f'EPOCH {epoch + 1}:\tTrain loss: {train_loss:.4f}\tVal loss: {val_loss:.4f}')
 
     return train_losses, val_losses
+
+
+def main(train_in_path=None, val_in_path=None):
+    if train_in_path == None or val_in_path == None:
+        train_in_path = "small-coco-stuff/train2017/train2017"
+        val_in_path = "small-coco-stuff/train2017/train2017"
+
+    train_batch_size = 16
+    val_batch_size = 8
+
+    train_loader = create_dataloader(train_in_path, batch_size=train_batch_size, shuffle=True)
+    val_loader = create_dataloader(val_in_path, batch_size=val_batch_size,shuffle=False)
+
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    model = ECCV_Regression().to(device)
+
+    lr = 1e-3
+    epochs = 50
+
+    criterion = nn.MSELoss()
+    optimizer = torch.optim.Adam(model.parameters(), lr=lr)
+
+    train_losses, val_losses = fit(
+        model,
+        train_loader,
+        val_loader,
+        criterion,
+        optimizer,
+        device,
+        epochs,
+        lr,
+        train_batch_size
+    )
