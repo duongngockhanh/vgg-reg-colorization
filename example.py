@@ -1,7 +1,7 @@
 import torch
 import matplotlib.pyplot as plt
 from colorizers import *
-from dataload import create_dataloader
+from dataloaders import *
 
 train_in_path = "small-coco-stuff/train2017/train2017"
 val_in_path = "small-coco-stuff/train2017/train2017"

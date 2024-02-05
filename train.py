@@ -2,7 +2,7 @@ import wandb
 import torch
 import matplotlib.pyplot as plt
 from colorizers import *
-from dataload import create_dataloader
+from dataloaders import *
 from torchsummary import summary
 
 
