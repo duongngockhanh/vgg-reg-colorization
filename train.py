@@ -20,7 +20,7 @@ def evaluate(model, dataloader, criterion, device):
 
 def fit(model, train_loader, val_loader, criterion, optimizer, device, epochs, lr, train_batch_size):
     wandb.init(
-        project="zhang-train-reg",
+        project="zhang-train-reg-2",
         config={
             "dataset": "coco-stuff",
             "architecture": "ECCV - Linear",
@@ -45,7 +45,7 @@ def fit(model, train_loader, val_loader, criterion, optimizer, device, epochs, l
             loss.backward()
             optimizer.step()
             batch_train_losses.append(loss.item())
-            if train_batch_size * len(batch_train_losses) > 20000:
+            if train_batch_size * len(batch_train_losses) > 180000:
                 break
 
         train_loss = sum(batch_train_losses) / len(batch_train_losses)
