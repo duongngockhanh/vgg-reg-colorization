@@ -54,16 +54,18 @@ def fit(model, train_loader, val_loader, criterion, optimizer, device, epochs, l
         val_loss = evaluate(model, val_loader, criterion, device)
         val_losses.append(val_loss)
 
-        # Show image
-        val_iter = iter(val_loader)
-        val_first = next(val_iter)
-        showed_in = val_first[0][:1]
-        showed_pred = model(showed_in)
-        showed_res = postprocess_tens(showed_in, showed_pred)
-        showed_res = Image.fromarray(showed_res)
-        image = wandb.Image(showed_res, caption=f"epoch {epoch}")
+        # # Show image
+        # val_iter = iter(val_loader)
+        # val_first = next(val_iter)
+        # showed_in = val_first[0][:1].to(device)
+        # print(showed_in.dtype)
+        # showed_pred = model(showed_in)
+        # print(showed_pred.dtype)
+        # showed_res = postprocess_tens(showed_in, showed_pred)
+        # showed_res = Image.fromarray(showed_res)
+        # image = wandb.Image(showed_res, caption=f"epoch {epoch}")
 
-        wandb.log({"train_loss": train_loss, "val_loss": val_loss, "image": image})
+        wandb.log({"train_loss": train_loss, "val_loss": val_loss})
 
         print(f'EPOCH {epoch + 1}:\tTrain loss: {train_loss:.4f}\tVal loss: {val_loss:.4f}')
 
