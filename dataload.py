@@ -1,0 +1,22 @@
+import os
+from colorizers import *
+from torch.utils.data import Dataset, DataLoader
+
+class DatasetColor(Dataset):
+    def __init__(self, data_root):
+        super().__init__()
+        self.data_root = data_root
+        self.file_list = sorted(os.listdir(self.data_root))
+
+    def __len__(self):
+        return len(self.data_root)
+    
+    def __getitem__(self, index):
+        img_rgb = load_img(os.path.join(self.data_root, self.file_list[index]))
+        _, _, tens_rs_l, tens_rs_ab = preprocess_img(img_rgb)
+        return tens_rs_l, tens_rs_ab
+    
+def create_dataloader(data_root, batch_size=16, num_workers=4, shuffle=False):
+    dataset = DatasetColor(data_root)
+    dataloader = DataLoader(dataset, batch_size=batch_size, num_workers=num_workers, shuffle=shuffle)
+    return dataloader
