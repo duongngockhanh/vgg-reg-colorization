@@ -45,7 +45,7 @@ def fit(model, train_loader, val_loader, criterion, optimizer, device, epochs, l
             loss.backward()
             optimizer.step()
             batch_train_losses.append(loss.item())
-            if train_batch_size * len(batch_train_losses) > 10000:
+            if train_batch_size * len(batch_train_losses) > 20000:
                 break
 
         train_loss = sum(batch_train_losses) / len(batch_train_losses)
@@ -69,6 +69,8 @@ def fit(model, train_loader, val_loader, criterion, optimizer, device, epochs, l
 
         print(f'EPOCH {epoch + 1}:\tTrain loss: {train_loss:.4f}\tVal loss: {val_loss:.4f}')
 
+    wandb.finish()
+
     return train_losses, val_losses
 
 
@@ -77,7 +79,7 @@ def main(train_in_path=None, val_in_path=None):
         train_in_path = "small-coco-stuff/train2017/train2017"
         val_in_path = "small-coco-stuff/train2017/train2017"
 
-    train_batch_size = 16
+    train_batch_size = 32
     val_batch_size = 8
 
     train_loader = create_dataloader(train_in_path, batch_size=train_batch_size, shuffle=True)
