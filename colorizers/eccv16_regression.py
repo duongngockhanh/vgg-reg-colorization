@@ -6,9 +6,9 @@ from IPython import embed
 
 from .base_color import *
 
-class ECCVGenerator(BaseColor):
+class ECCV_Regression(BaseColor):
     def __init__(self, norm_layer=nn.BatchNorm2d):
-        super(ECCVGenerator, self).__init__()
+        super().__init__()
 
         model1=[nn.Conv2d(1, 64, kernel_size=3, stride=1, padding=1, bias=True),]
         model1+=[nn.ReLU(True),]
