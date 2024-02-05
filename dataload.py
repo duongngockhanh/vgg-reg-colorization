@@ -1,5 +1,6 @@
 import os
 from colorizers import *
+from torchvision import transforms
 from torch.utils.data import Dataset, DataLoader
 
 class DatasetColor(Dataset):
@@ -16,7 +17,7 @@ class DatasetColor(Dataset):
         _, _, tens_rs_l, tens_rs_ab = preprocess_img(img_rgb)
         return tens_rs_l, tens_rs_ab
     
-def create_dataloader(data_root, batch_size=16, num_workers=4, shuffle=False):
+def create_dataloader(data_root, batch_size=16, shuffle=False):
     dataset = DatasetColor(data_root)
-    dataloader = DataLoader(dataset, batch_size=batch_size, num_workers=num_workers, shuffle=shuffle)
+    dataloader = DataLoader(dataset, batch_size=batch_size, shuffle=shuffle)
     return dataloader

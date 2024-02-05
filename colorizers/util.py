@@ -19,18 +19,18 @@ def preprocess_img(img_rgb_orig, HW=(256,256), resample=3):
 	# return original size L and resized L as torch Tensors
 	img_rgb_rs = resize_img(img_rgb_orig, HW=HW, resample=resample)
 	
-	img_lab_orig = color.rgb2lab(img_rgb_orig)
-	img_lab_rs = color.rgb2lab(img_rgb_rs)
+	img_lab_orig = color.rgb2lab(img_rgb_orig).transpose(2, 0, 1)
+	img_lab_rs = color.rgb2lab(img_rgb_rs).transpose(2, 0, 1)
 
-	img_l_orig = img_lab_orig[:,:,1:]
-	img_ab_orig = img_lab_orig[:,:,1:]
-	img_l_rs = img_lab_rs[:,:,:1]
-	img_ab_rs = img_lab_rs[:,:,1:]
+	img_l_orig = img_lab_orig[:1,:,:]
+	img_ab_orig = img_lab_orig[1:,:,:]
+	img_l_rs = img_lab_rs[:1,:,:]
+	img_ab_rs = img_lab_rs[1:,:,:]
 
-	tens_orig_l = torch.Tensor(img_l_orig)[None,:,:,:]
-	tens_orig_ab = torch.Tensor(img_ab_orig)[None,:,:,:]
-	tens_rs_l = torch.Tensor(img_l_rs)[None,:,:,:]
-	tens_rs_ab = torch.Tensor(img_ab_rs)[None,:,:,:]
+	tens_orig_l = torch.Tensor(img_l_orig)
+	tens_orig_ab = torch.Tensor(img_ab_orig)
+	tens_rs_l = torch.Tensor(img_l_rs)
+	tens_rs_ab = torch.Tensor(img_ab_rs)
 
 	return (tens_orig_l, tens_orig_ab, tens_rs_l, tens_rs_ab)
 
@@ -43,7 +43,7 @@ def postprocess_tens(tens_orig_l, out_ab, mode='bilinear'):
 
 	# call resize function if needed
 	if(HW_orig[0]!=HW[0] or HW_orig[1]!=HW[1]):
-		out_ab_orig = F.interpolate(out_ab, size=HW_orig, mode='bilinear')
+		out_ab_orig = F.interpolate(out_ab, size=HW_orig, mode=mode)
 	else:
 		out_ab_orig = out_ab
 
