@@ -18,9 +18,9 @@ def evaluate(model, dataloader, criterion, device):
     return loss
 
 
-def fit(model, train_loader, val_loader, criterion, optimizer, device, epochs, lr, train_batch_size):
+def fit(model, train_loader, val_loader, criterion, optimizer, device, epochs, lr, train_batch_size, save_dir="exp"):
     wandb.init(
-        project="zhang-train-reg-2",
+        project="zhang-train-reg-4",
         config={
             "dataset": "coco-stuff",
             "architecture": "ECCV - Linear",
@@ -34,6 +34,19 @@ def fit(model, train_loader, val_loader, criterion, optimizer, device, epochs, l
     train_losses = []
     val_losses = []
 
+    if not os.path.exists(save_dir):
+        os.makedirs(save_dir)
+    saved_weights = sorted(os.listdir(save_dir))
+    if len(saved_weights) == 0:
+        saved_weight_file = "exp1.pt"
+        saved_weight_path = os.path.join(save_dir, saved_weight_file)
+    else:
+        saved_weight_file = "exp" + str(int(saved_weights[-1][3:-3]) + 1) + ".pt"
+        saved_weight_path = os.path.join(save_dir, saved_weight_file)
+    print(f"Weights will be saved in {saved_weight_path}")
+
+    best_val_loss = 10e5
+
     for epoch in range(epochs):
         batch_train_losses = []
         model.train()
@@ -45,14 +58,21 @@ def fit(model, train_loader, val_loader, criterion, optimizer, device, epochs, l
             loss.backward()
             optimizer.step()
             batch_train_losses.append(loss.item())
-            if train_batch_size * len(batch_train_losses) > 180000:
-                break
+            # if train_batch_size * len(batch_train_losses) > 180000:
+            #     break
 
         train_loss = sum(batch_train_losses) / len(batch_train_losses)
         train_losses.append(train_loss)
 
         val_loss = evaluate(model, val_loader, criterion, device)
         val_losses.append(val_loss)
+
+        if val_loss < best_val_loss:
+            torch.save(model.state_dict(), saved_weight_path)
+            best_val_loss = val_loss
+
+        # model.load_state_dict(torch.load(saved_weight_path))
+        # model.eval()
 
         # # Show image
         # val_iter = iter(val_loader)
