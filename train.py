@@ -1,4 +1,5 @@
 import wandb
+import time
 import torch
 import matplotlib.pyplot as plt
 from colorizers import *
@@ -46,6 +47,7 @@ def fit(model, train_loader, val_loader, criterion, optimizer, device, epochs, l
     print(f"Weights will be saved in {saved_weight_path}")
 
     best_val_loss = 10e5
+    start_time = time.time()
 
     for epoch in range(epochs):
         batch_train_losses = []
@@ -89,6 +91,7 @@ def fit(model, train_loader, val_loader, criterion, optimizer, device, epochs, l
 
         print(f'EPOCH {epoch + 1}:\tTrain loss: {train_loss:.4f}\tVal loss: {val_loss:.4f}')
 
+    print(f"Complete training in {time.time() - start_time:2f}s")
     wandb.finish()
 
     return train_losses, val_losses
@@ -96,14 +99,14 @@ def fit(model, train_loader, val_loader, criterion, optimizer, device, epochs, l
 
 def main(train_in_path=None, val_in_path=None):
     if train_in_path == None or val_in_path == None:
-        train_in_path = "small-coco-stuff/train2017/train2017"
-        val_in_path = "small-coco-stuff/train2017/train2017"
+        train_in_path = "/kaggle/input/small-coco-stuff/small-coco-stuff/train2017/train2017"
+        val_in_path = "/kaggle/input/small-coco-stuff/small-coco-stuff/train2017/train2017"
 
     train_batch_size = 32
     val_batch_size = 8
 
     train_loader = create_dataloader(train_in_path, batch_size=train_batch_size, shuffle=True)
-    val_loader = create_dataloader(val_in_path, batch_size=val_batch_size,shuffle=False)
+    val_loader = create_dataloader(val_in_path, batch_size=val_batch_size, shuffle=False)
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     model = ECCV_Regression().to(device)
