@@ -6,6 +6,35 @@ from colorizers import *
 from dataloaders import *
 
 
+def show_image_wandb(val_loader, model, val_batch_size, device, epoch):
+    model.eval()
+    with torch.no_grad():
+        val_iter = iter(val_loader)
+        val_first = next(val_iter)
+
+        images_pred = []
+        images_gt = []
+
+        fixed_num_showed_image = 5
+        num_showed_image = val_batch_size if val_batch_size < fixed_num_showed_image else fixed_num_showed_image
+
+        for i in range(num_showed_image):
+            l_in = val_first[0][i:i+1].to(device)
+            ab_pred = model(l_in)
+            rgb_pred = postprocess_tens(l_in, ab_pred)
+            rgb_pred = Image.fromarray((rgb_pred * 255).astype(np.uint8))
+            image_pred = wandb.Image(rgb_pred, caption=f"epoch {epoch}")
+            images_pred.append(image_pred)
+
+            ab_gt = val_first[1][i:i+1].to(device)
+            rgb_gt = postprocess_tens(l_in, ab_gt)
+            rgb_gt = Image.fromarray((rgb_gt * 255).astype(np.uint8))
+            image_gt = wandb.Image(rgb_gt, caption=f"epoch {epoch}")
+            images_gt.append(image_gt)
+
+    return images_pred, images_gt
+
+
 def evaluate(model, dataloader, criterion, device):
     model.eval()
     losses = []
@@ -19,9 +48,9 @@ def evaluate(model, dataloader, criterion, device):
     return loss
 
 
-def fit(model, train_loader, val_loader, criterion, optimizer, device, epochs, lr, train_batch_size, save_dir="exp"):
+def fit(model, train_loader, val_loader, criterion, optimizer, device, epochs, lr, train_batch_size, val_batch_size, save_dir="exp"):
     wandb.init(
-        project="zhang-train-reg-4",
+        project="zhang-train-reg-5",
         config={
             "dataset": "coco-stuff",
             "architecture": "ECCV - Linear",
@@ -39,10 +68,10 @@ def fit(model, train_loader, val_loader, criterion, optimizer, device, epochs, l
         os.makedirs(save_dir)
     saved_weights = sorted(os.listdir(save_dir))
     if len(saved_weights) == 0:
-        saved_weight_file = "exp1.pt"
+        saved_weight_file = "exp01.pt"
         saved_weight_path = os.path.join(save_dir, saved_weight_file)
     else:
-        saved_weight_file = "exp" + str(int(saved_weights[-1][3:-3]) + 1) + ".pt"
+        saved_weight_file = f"exp{int(saved_weights[-1][3:-3]) + 1:02d}.pt"
         saved_weight_path = os.path.join(save_dir, saved_weight_file)
     print(f"Weights will be saved in {saved_weight_path}")
 
@@ -73,21 +102,10 @@ def fit(model, train_loader, val_loader, criterion, optimizer, device, epochs, l
             torch.save(model.state_dict(), saved_weight_path)
             best_val_loss = val_loss
 
-        # model.load_state_dict(torch.load(saved_weight_path))
-        # model.eval()
+        # Show image
+        images_pred, images_gt = show_image_wandb(val_loader, model, val_batch_size, device, epoch)
 
-        # # Show image
-        # val_iter = iter(val_loader)
-        # val_first = next(val_iter)
-        # showed_in = val_first[0][:1].to(device)
-        # print(showed_in.dtype)
-        # showed_pred = model(showed_in)
-        # print(showed_pred.dtype)
-        # showed_res = postprocess_tens(showed_in, showed_pred)
-        # showed_res = Image.fromarray(showed_res)
-        # image = wandb.Image(showed_res, caption=f"epoch {epoch}")
-
-        wandb.log({"train_loss": train_loss, "val_loss": val_loss})
+        wandb.log({"train_loss": train_loss, "val_loss": val_loss, "images_pred": images_pred, "images_gt": images_gt})
 
         print(f'EPOCH {epoch + 1}:\tTrain loss: {train_loss:.4f}\tVal loss: {val_loss:.4f}')
 
@@ -126,5 +144,6 @@ def main(train_in_path=None, val_in_path=None):
         device,
         epochs,
         lr,
-        train_batch_size
+        train_batch_size,
+        val_batch_size
     )
