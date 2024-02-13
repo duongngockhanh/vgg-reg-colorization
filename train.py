@@ -21,13 +21,13 @@ def show_image_wandb(val_loader, model, val_batch_size, device, epoch):
         for i in range(num_showed_image):
             l_in = val_first[0][i:i+1].to(device)
             ab_pred = model(l_in)
-            rgb_pred = postprocess_tens(denormalize_l(l_in), denormalize_ab(ab_pred))
+            rgb_pred = postprocess_tens(l_in, ab_pred)
             rgb_pred = Image.fromarray((rgb_pred * 255).astype(np.uint8))
             image_pred = wandb.Image(rgb_pred, caption=f"epoch {epoch}")
             images_pred.append(image_pred)
 
             ab_gt = val_first[1][i:i+1].to(device)
-            rgb_gt = postprocess_tens(denormalize_l(l_in), denormalize_ab(ab_gt))
+            rgb_gt = postprocess_tens(l_in, ab_gt)
             rgb_gt = Image.fromarray((rgb_gt * 255).astype(np.uint8))
             image_gt = wandb.Image(rgb_gt, caption=f"epoch {epoch}")
             images_gt.append(image_gt)
@@ -133,7 +133,7 @@ def main(train_in_path=None, val_in_path=None, weight=None):
         model.load_state_dict(torch.load(weight))
 
     lr = 1e-3
-    epochs = 10
+    epochs = 100
 
     criterion = nn.MSELoss()
     optimizer = torch.optim.Adam(model.parameters(), lr=lr)
