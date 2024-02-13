@@ -90,4 +90,4 @@ class ECCV_Regression(BaseColor):
         input_l = self.model6(input_l)
         input_l = self.model7(input_l)
         input_l = self.model8(input_l)
-        return self.upsample4(input_l)
+        return self.unnormalize_ab(self.upsample4(input_l))
