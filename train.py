@@ -22,9 +22,9 @@ def show_image_wandb(val_loader, model, val_batch_size, device, epoch):
             l_in = val_first[0][i:i+1].to(device)
             ab_pred = model(l_in)
 
-            temp = ab_pred.detach().cpu().numpy().reshape(-1)
-            plt.hist(temp)
-            plt.show()
+            # temp = ab_pred.detach().cpu().numpy().reshape(-1)
+            # plt.hist(temp)
+            # plt.show()
             
             rgb_pred = postprocess_tens(l_in, ab_pred)
             rgb_pred = Image.fromarray((rgb_pred * 255).astype(np.uint8))
@@ -84,6 +84,7 @@ def fit(model, train_loader, val_loader, criterion, optimizer, device, epochs, l
     start_time = time.time()
 
     for epoch in range(epochs):
+        start_time_epoch = time.time()
         batch_train_losses = []
         model.train()
         for _, (inputs, labels) in enumerate(train_loader):
@@ -112,7 +113,7 @@ def fit(model, train_loader, val_loader, criterion, optimizer, device, epochs, l
 
         wandb.log({"train_loss": train_loss, "val_loss": val_loss, "images_pred": images_pred, "images_gt": images_gt})
 
-        print(f'EPOCH {epoch + 1}:\tTrain loss: {train_loss:.4f}\tVal loss: {val_loss:.4f}')
+        print(f'EPOCH {epoch + 1}:\tTrain loss: {train_loss:.4f}\tVal loss: {val_loss:.4f}\tTime: {time.time() - start_time_epoch:.2f}s')
 
     print(f"Complete training in {time.time() - start_time:2f}s")
     wandb.finish()
@@ -132,13 +133,13 @@ def main(train_in_path=None, val_in_path=None, weight=None):
     val_loader = create_dataloader(val_in_path, batch_size=val_batch_size, shuffle=False)
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    model = ECCV_Regression().to(device)
+    model = ECCVGenerator().to(device)
 
     if weight != None:
         model.load_state_dict(torch.load(weight))
 
     lr = 1e-3
-    epochs = 10
+    epochs = 50
 
     criterion = nn.MSELoss()
     optimizer = torch.optim.Adam(model.parameters(), lr=lr)
@@ -153,5 +154,6 @@ def main(train_in_path=None, val_in_path=None, weight=None):
         epochs,
         lr,
         train_batch_size,
-        val_batch_size
+        val_batch_size,
+        save_dir="exp_eccv16"
     )
