@@ -55,7 +55,7 @@ def evaluate(model, dataloader, criterion, device):
 
 def fit(model, train_loader, val_loader, criterion, optimizer, device, epochs, lr, train_batch_size, val_batch_size, save_dir="exp"):
     wandb.init(
-        project="zhang-train-reg-5",
+        project="unet-train-reg",
         config={
             "dataset": "coco-stuff",
             "architecture": "ECCV - Linear",
@@ -133,13 +133,13 @@ def main(train_in_path=None, val_in_path=None, weight=None):
     val_loader = create_dataloader(val_in_path, batch_size=val_batch_size, shuffle=False)
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    model = ECCVGenerator().to(device)
+    model = Simple_UNet(1, 2).to(device)
 
     if weight != None:
         model.load_state_dict(torch.load(weight))
 
-    lr = 1e-3
-    epochs = 50
+    lr = 1e-4
+    epochs = 1
 
     criterion = nn.MSELoss()
     optimizer = torch.optim.Adam(model.parameters(), lr=lr)

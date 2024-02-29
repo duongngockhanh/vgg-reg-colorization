@@ -1,2 +1,2 @@
-from .dataloader import *
+from .dataloaders import *
 from .eda import *
