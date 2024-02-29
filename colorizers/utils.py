@@ -65,10 +65,10 @@ def preprocess_img(img_rgb_orig, HW=(256,256), resample=3):
 	img_rgb_orig = img_rgb_orig.transpose(2, 0, 1) / 255.0
 	img_rgb_rs = img_rgb_rs.transpose(2, 0, 1) / 255.0
 
-	img_r_orig = img_lab_orig[:1,:,:]
-	img_gb_orig = img_lab_orig[1:,:,:]
-	img_r_rs = img_lab_rs[:1,:,:]
-	img_gb_rs = img_lab_rs[1:,:,:]
+	img_r_orig = img_rgb_orig[:1,:,:]
+	img_gb_orig = img_rgb_orig[1:,:,:]
+	img_r_rs = img_rgb_rs[:1,:,:]
+	img_gb_rs = img_rgb_rs[1:,:,:]
 
 	tens_orig_r = torch.Tensor(img_r_orig)
 	tens_orig_gb = torch.Tensor(img_gb_orig)
@@ -95,5 +95,5 @@ def postprocess_tens(tens_orig_r, out_gb, mode='bilinear'):
 	else:
 		out_gb_orig = out_gb
 
-	out_rgb_orig = torch.cat((tens_orig_r, out_ab_orig), dim=1)
+	out_rgb_orig = torch.cat((tens_orig_r, out_gb_orig), dim=1)
 	return out_rgb_orig.data.cpu().numpy()[0,...].transpose((1,2,0)) * 255
