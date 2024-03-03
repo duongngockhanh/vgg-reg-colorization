@@ -10,7 +10,7 @@ class DatasetColor(Dataset):
         self.file_list = sorted(os.listdir(self.data_root))
 
     def __len__(self):
-        return len(self.data_root)
+        return len(self.file_list)
     
     def __getitem__(self, index):
         img_rgb = load_img(os.path.join(self.data_root, self.file_list[index]))

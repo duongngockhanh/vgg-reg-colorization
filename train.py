@@ -1,5 +1,6 @@
 import sys
 del sys.modules['colorizers']
+del sys.modules['dataloaders']
 
 import wandb
 import time
@@ -95,6 +96,7 @@ def fit(model, train_loader, val_loader,
     for epoch in range(epochs):
         start_time_epoch = time.time()
         batch_train_losses = []
+
         model.train()
         for _, (inputs, labels) in enumerate(train_loader):
             inputs, labels = inputs.to(device), labels.to(device)
@@ -104,8 +106,8 @@ def fit(model, train_loader, val_loader,
             loss.backward()
             optimizer.step()
             batch_train_losses.append(loss.item())
-            # if train_batch_size * len(batch_train_losses) > 180000:
-            #     break
+            if train_batch_size * len(batch_train_losses) > 100:
+                break
 
         train_loss = sum(batch_train_losses) / len(batch_train_losses)
         train_losses.append(train_loss)
@@ -114,7 +116,6 @@ def fit(model, train_loader, val_loader,
         val_losses.append(val_loss)
 
         if val_loss < best_val_loss:
-            print("save weight ...")
             torch.save(model.state_dict(), saved_weight_path)
             best_val_loss = val_loss
 
@@ -147,15 +148,15 @@ def main(train_in_path=None, val_in_path=None, weight=None, use_wandb=False):
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     model = Simple_UNet_Lab(1, 2).to(device)
 
-    if weight != None:
-        print(f"Load model from {weight}")
-        model.load_state_dict(torch.load(weight))
-
     lr = 5e-4
     epochs = 1
 
     criterion = nn.MSELoss()
     optimizer = torch.optim.Adam(model.parameters(), lr=lr)
+
+    if weight != None:
+        print(f"Load model from {weight}")
+        model.load_state_dict(torch.load(weight))
 
     train_losses, val_losses = fit(
         model,
