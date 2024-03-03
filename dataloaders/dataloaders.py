@@ -19,5 +19,6 @@ class DatasetColor(Dataset):
     
 def create_dataloader(data_root, batch_size=16, shuffle=False):
     dataset = DatasetColor(data_root)
+    print("Khanh 2")
     dataloader = DataLoader(dataset, batch_size=batch_size, shuffle=shuffle)
     return dataloader

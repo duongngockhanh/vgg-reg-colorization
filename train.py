@@ -53,18 +53,23 @@ def evaluate(model, dataloader, criterion, device):
     return loss
 
 
-def fit(model, train_loader, val_loader, criterion, optimizer, device, epochs, lr, train_batch_size, val_batch_size, save_dir="exp"):
-    wandb.init(
-        project="unet-train-reg",
-        config={
-            "dataset": "coco-stuff",
-            "architecture": "ECCV - Linear",
-            "criterion": "MSE",
-            "optimizer": "Adam",
-            "epochs": 50,
-            "lr": lr
-        }
-    )
+def fit(model, train_loader, val_loader, 
+        criterion, optimizer, device, epochs, lr, 
+        train_batch_size, val_batch_size, 
+        use_wandb, save_dir="exp"):
+
+    if use_wandb == True:
+        wandb.init(
+            project="unet-train-reg",
+            config={
+                "dataset": "coco-stuff",
+                "architecture": "ECCV - Linear",
+                "criterion": "MSE",
+                "optimizer": "Adam",
+                "epochs": 50,
+                "lr": lr
+            }
+        )
     
     train_losses = []
     val_losses = []
@@ -109,19 +114,21 @@ def fit(model, train_loader, val_loader, criterion, optimizer, device, epochs, l
             best_val_loss = val_loss
 
         # Show image
-        images_pred, images_gt = show_image_wandb(val_loader, model, val_batch_size, device, epoch)
-
-        wandb.log({"train_loss": train_loss, "val_loss": val_loss, "images_pred": images_pred, "images_gt": images_gt})
+        if use_wandb == True:
+            images_pred, images_gt = show_image_wandb(val_loader, model, val_batch_size, device, epoch)
+            wandb.log({"train_loss": train_loss, "val_loss": val_loss, "images_pred": images_pred, "images_gt": images_gt})
 
         print(f'EPOCH {epoch + 1}:\tTrain loss: {train_loss:.4f}\tVal loss: {val_loss:.4f}\tTime: {time.time() - start_time_epoch:.2f}s')
 
     print(f"Complete training in {time.time() - start_time:2f}s")
-    wandb.finish()
+
+    if use_wandb == True:
+        wandb.finish()
 
     return train_losses, val_losses
 
 
-def main(train_in_path=None, val_in_path=None, weight=None):
+def main(train_in_path=None, val_in_path=None, weight=None, use_wandb=False):
     if train_in_path == None or val_in_path == None:
         train_in_path = "/kaggle/input/small-coco-stuff/small-coco-stuff/train2017/train2017"
         val_in_path = "/kaggle/input/small-coco-stuff/small-coco-stuff/train2017/train2017"
@@ -133,7 +140,7 @@ def main(train_in_path=None, val_in_path=None, weight=None):
     val_loader = create_dataloader(val_in_path, batch_size=val_batch_size, shuffle=False)
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    model = Simple_UNet(1, 2).to(device)
+    model = ECCV_Regression_RGB().to(device)
 
     if weight != None:
         model.load_state_dict(torch.load(weight))
@@ -155,5 +162,6 @@ def main(train_in_path=None, val_in_path=None, weight=None):
         lr,
         train_batch_size,
         val_batch_size,
+        use_wandb,
         save_dir="exp_eccv16"
     )
