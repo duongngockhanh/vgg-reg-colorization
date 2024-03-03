@@ -45,7 +45,7 @@ def show_image_wandb(val_loader, model, val_batch_size, device, epoch):
     return images_pred, images_gt
 
 
-def evaluate(model, dataloader, criterion, device):
+def evaluate(model, dataloader, criterion, device, val_batch_size, val_num_max):
     model.eval()
     losses = []
     with torch.no_grad():
@@ -54,26 +54,23 @@ def evaluate(model, dataloader, criterion, device):
             outputs = model(inputs)
             loss = criterion(outputs, labels)
             losses.append(loss.item())
+            if val_batch_size * len(losses) > val_num_max:
+                break
     loss = sum(losses) / len(losses)
     return loss
 
 
-def fit(model, train_loader, val_loader, 
+def fit(model, train_loader, val_loader, save_dir,
         criterion, optimizer, device, epochs, lr, 
-        train_batch_size, val_batch_size, 
-        use_wandb, save_dir="exp"):
+        train_batch_size, val_batch_size,
+        train_num_max, val_num_max,
+        use_wandb, wandb_proj_name, wandb_config
+        ):
 
     if use_wandb == True:
         wandb.init(
-            project="zhang-reg-norm-lab",
-            config={
-                "dataset": "coco-stuff",
-                "architecture": "ECCV - Linear",
-                "criterion": "MSE",
-                "optimizer": "Adam",
-                "epochs": 50,
-                "lr": lr
-            }
+            project=wandb_proj_name,
+            config=wandb_config
         )
     
     train_losses = []
@@ -106,13 +103,13 @@ def fit(model, train_loader, val_loader,
             loss.backward()
             optimizer.step()
             batch_train_losses.append(loss.item())
-            if train_batch_size * len(batch_train_losses) > 100:
+            if train_batch_size * len(batch_train_losses) > train_num_max:
                 break
 
         train_loss = sum(batch_train_losses) / len(batch_train_losses)
         train_losses.append(train_loss)
 
-        val_loss = evaluate(model, val_loader, criterion, device)
+        val_loss = evaluate(model, val_loader, criterion, device, val_batch_size, val_num_max)
         val_losses.append(val_loss)
 
         if val_loss < best_val_loss:
@@ -134,41 +131,48 @@ def fit(model, train_loader, val_loader,
     return train_losses, val_losses
 
 
-def main(train_in_path=None, val_in_path=None, weight=None, use_wandb=False):
-    if train_in_path == None or val_in_path == None:
-        train_in_path = "/kaggle/input/small-coco-stuff/small-coco-stuff/train2017/train2017"
-        val_in_path = "/kaggle/input/small-coco-stuff/small-coco-stuff/train2017/train2017"
-
+def main():
+    save_dir = "exp"
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     train_batch_size = 32
     val_batch_size = 8
-
+    train_in_path = "/kaggle/input/aio-coco-stuff/train2017/train2017"
+    val_in_path = "/kaggle/input/aio-coco-stuff/val2017/val2017"
     train_loader = create_dataloader(train_in_path, batch_size=train_batch_size, shuffle=True)
     val_loader = create_dataloader(val_in_path, batch_size=val_batch_size, shuffle=False)
 
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    # Hyperparameters
     model = Simple_UNet_Lab(1, 2).to(device)
-
+    epochs = 10
     lr = 5e-4
-    epochs = 1
-
     criterion = nn.MSELoss()
     optimizer = torch.optim.Adam(model.parameters(), lr=lr)
+    train_num_max = 200
+    val_num_max = 20
+    pretrained = None
 
-    if weight != None:
-        print(f"Load model from {weight}")
-        model.load_state_dict(torch.load(weight))
+    if pretrained != None:
+        print(f"Load model from {pretrained}")
+        model.load_state_dict(torch.load(pretrained))
+
+    use_wandb = True # Use WanDB
+    wandb_proj_name = "zhang-reg-norm-lab-02"
+    wandb_config = {
+        "dataset": "coco-stuff",
+        "model": "Simple_UNet_Lab",
+        "epochs": epochs,
+        "lr": lr,
+        "criterion": "MSE",
+        "optimizer": "Adam",
+        "train_num_max": train_num_max,
+        "val_num_max": val_num_max,
+        "pretrained": pretrained
+    }
 
     train_losses, val_losses = fit(
-        model,
-        train_loader,
-        val_loader,
-        criterion,
-        optimizer,
-        device,
-        epochs,
-        lr,
-        train_batch_size,
-        val_batch_size,
-        use_wandb,
-        save_dir="exp_eccv16"
+        model, train_loader, val_loader, save_dir,
+        criterion, optimizer, device, epochs, lr,
+        train_batch_size, val_batch_size,
+        train_num_max, val_num_max,
+        use_wandb, wandb_proj_name, wandb_config
     )
