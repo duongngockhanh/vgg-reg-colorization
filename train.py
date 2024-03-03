@@ -1,3 +1,6 @@
+import sys
+del sys.modules['colorizers']
+
 import wandb
 import time
 import torch
@@ -5,12 +8,6 @@ import torch.nn as nn
 import matplotlib.pyplot as plt
 from colorizers import *
 from dataloaders import *
-
-# import sys
-# root_path = os.getcwd()
-# colorizers_path = os.path.join(root_path, "colorful-image-colorization/colorizers")
-# sys.path.append(colorizers_path)
-# from eccv16_regression_lab import *
 
 
 def show_image_wandb(val_loader, model, val_batch_size, device, epoch):
@@ -117,6 +114,7 @@ def fit(model, train_loader, val_loader,
         val_losses.append(val_loss)
 
         if val_loss < best_val_loss:
+            print("save weight ...")
             torch.save(model.state_dict(), saved_weight_path)
             best_val_loss = val_loss
 
@@ -154,7 +152,7 @@ def main(train_in_path=None, val_in_path=None, weight=None, use_wandb=False):
         model.load_state_dict(torch.load(weight))
 
     lr = 5e-4
-    epochs = 200
+    epochs = 1
 
     criterion = nn.MSELoss()
     optimizer = torch.optim.Adam(model.parameters(), lr=lr)

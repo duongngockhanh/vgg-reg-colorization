@@ -15,7 +15,7 @@ def main(train_in_path=None, val_in_path=None, weight=None):
     val_loader = create_dataloader(val_in_path, batch_size=val_batch_size, shuffle=False)
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    model = ECCV_Regression().to(device)
+    model = Simple_UNet_Lab(1, 2).to(device)
 
     if weight != None:
         model.load_state_dict(torch.load(weight))
@@ -35,9 +35,7 @@ def main(train_in_path=None, val_in_path=None, weight=None):
             l_in = val_first[0][i:i+1].to(device)
             ab_pred = model(l_in)
             temp = ab_pred.detach().cpu().numpy().reshape(-1)
-            plt.hist(temp)
-            plt.show()
             rgb_pred = postprocess_tens(l_in, ab_pred)
-            # plt.imshow(rgb_pred)
-            # plt.show()
+            plt.imshow(rgb_pred)
+            plt.show()
             
