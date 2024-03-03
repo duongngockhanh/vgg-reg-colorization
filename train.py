@@ -1,9 +1,16 @@
 import wandb
 import time
 import torch
+import torch.nn as nn
 import matplotlib.pyplot as plt
 from colorizers import *
 from dataloaders import *
+
+# import sys
+# root_path = os.getcwd()
+# colorizers_path = os.path.join(root_path, "colorful-image-colorization/colorizers")
+# sys.path.append(colorizers_path)
+# from eccv16_regression_lab import *
 
 
 def show_image_wandb(val_loader, model, val_batch_size, device, epoch):
@@ -60,7 +67,7 @@ def fit(model, train_loader, val_loader,
 
     if use_wandb == True:
         wandb.init(
-            project="unet-train-reg",
+            project="zhang-reg-norm-lab",
             config={
                 "dataset": "coco-stuff",
                 "architecture": "ECCV - Linear",
@@ -140,13 +147,14 @@ def main(train_in_path=None, val_in_path=None, weight=None, use_wandb=False):
     val_loader = create_dataloader(val_in_path, batch_size=val_batch_size, shuffle=False)
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    model = ECCV_Regression_RGB().to(device)
+    model = Simple_UNet_Lab(1, 2).to(device)
 
     if weight != None:
+        print(f"Load model from {weight}")
         model.load_state_dict(torch.load(weight))
 
-    lr = 1e-4
-    epochs = 1
+    lr = 5e-4
+    epochs = 200
 
     criterion = nn.MSELoss()
     optimizer = torch.optim.Adam(model.parameters(), lr=lr)

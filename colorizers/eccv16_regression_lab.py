@@ -6,7 +6,7 @@ from IPython import embed
 
 from .base_color import *
 
-class ECCV_Regression(BaseColor):
+class ECCV_Regression_Lab(BaseColor):
     def __init__(self, norm_layer=nn.BatchNorm2d):
         super().__init__()
 
@@ -70,6 +70,8 @@ class ECCV_Regression(BaseColor):
         model8+=[nn.ReLU(True),]
 
         model8+=[nn.Conv2d(256, 2, kernel_size=1, stride=1, padding=0, bias=True),]
+        model8+=[nn.Conv2d(2, 2, kernel_size=3, stride=1, padding=1, bias=True),]
+        model8+=[nn.Tanh(),]
 
         self.model1 = nn.Sequential(*model1)
         self.model2 = nn.Sequential(*model2)

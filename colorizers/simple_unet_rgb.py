@@ -40,7 +40,7 @@ class Decoder(nn.Module):
     output = self.conv(output)
     return output
 
-class Simple_UNet(nn.Module):
+class Simple_UNet_RGB(nn.Module):
   def __init__(self, in_channels, out_channels):
     super().__init__()
     self.in_conv = ConvBlock(in_channels, 64)
