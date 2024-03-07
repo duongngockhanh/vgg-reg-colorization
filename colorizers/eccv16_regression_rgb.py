@@ -80,8 +80,6 @@ class ECCV_Regression_RGB(BaseColor):
         self.model7 = nn.Sequential(*model7)
         self.model8 = nn.Sequential(*model8)
         self.upsample4 = nn.Upsample(scale_factor=4, mode='bilinear')
-
-        self.conv9 = nn.Conv2d(2, 2, kernel_size=1, stride=1, padding=0, bias=True)
         self.sigmoid = nn.Sigmoid()
 
     def forward(self, input_l):
@@ -94,6 +92,5 @@ class ECCV_Regression_RGB(BaseColor):
         input_l = self.model7(input_l)
         input_l = self.model8(input_l)
         input_l = self.upsample4(input_l)
-        input_l = self.conv9(input_l)
         input_l = self.sigmoid(input_l)
         return (input_l)

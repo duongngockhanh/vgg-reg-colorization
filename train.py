@@ -60,8 +60,8 @@ def evaluate(model, dataloader, criterion, device, val_batch_size, val_num_max):
     return loss
 
 
-def fit(model, train_loader, val_loader, save_dir,
-        criterion, optimizer, device, epochs, lr, 
+def fit(model, train_loader, val_loader, saved_weight_path,
+        criterion, optimizer, device, epochs, 
         train_batch_size, val_batch_size,
         train_num_max, val_num_max,
         use_wandb, wandb_proj_name, wandb_config
@@ -75,17 +75,6 @@ def fit(model, train_loader, val_loader, save_dir,
     
     train_losses = []
     val_losses = []
-
-    if not os.path.exists(save_dir):
-        os.makedirs(save_dir)
-    saved_weights = sorted(os.listdir(save_dir))
-    if len(saved_weights) == 0:
-        saved_weight_file = "exp01.pt"
-        saved_weight_path = os.path.join(save_dir, saved_weight_file)
-    else:
-        saved_weight_file = f"exp{int(saved_weights[-1][3:-3]) + 1:02d}.pt"
-        saved_weight_path = os.path.join(save_dir, saved_weight_file)
-    print(f"Weights will be saved in {saved_weight_path}")
 
     best_val_loss = 10e5
     start_time = time.time()
@@ -132,7 +121,7 @@ def fit(model, train_loader, val_loader, save_dir,
 
 
 def main():
-    save_dir = "exp"
+    save_dir = "exp_eccv"
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     train_batch_size = 32
     val_batch_size = 8
@@ -142,36 +131,50 @@ def main():
     val_loader = create_dataloader(val_in_path, batch_size=val_batch_size, shuffle=False)
 
     # Hyperparameters
-    model = Simple_UNet_Lab(1, 2).to(device)
-    epochs = 10
+    model = ECCV_Regression_Lab().to(device)
+    epochs = 100
     lr = 5e-4
     criterion = nn.MSELoss()
     optimizer = torch.optim.Adam(model.parameters(), lr=lr)
-    train_num_max = 200
-    val_num_max = 20
+    train_num_max = 2000
+    val_num_max = 200
     pretrained = None
 
     if pretrained != None:
         print(f"Load model from {pretrained}")
         model.load_state_dict(torch.load(pretrained))
 
-    use_wandb = True # Use WanDB
-    wandb_proj_name = "zhang-reg-norm-lab-02"
+    # Save weight
+    if not os.path.exists(save_dir):
+        os.makedirs(save_dir)
+    saved_weights = sorted(os.listdir(save_dir))
+    if len(saved_weights) == 0:
+        saved_weight_file = "exp01.pt"
+        saved_weight_path = os.path.join(save_dir, saved_weight_file)
+    else:
+        saved_weight_file = f"exp{int(saved_weights[-1][3:-3]) + 1:02d}.pt"
+        saved_weight_path = os.path.join(save_dir, saved_weight_file)
+    print(f"Weights will be saved in {saved_weight_path}")
+
+    # Use WanDB
+    use_wandb = True 
+    wandb_proj_name = "zhang-reg-norm-lab-03"
     wandb_config = {
         "dataset": "coco-stuff",
-        "model": "Simple_UNet_Lab",
+        "model": "ECCV_Regression_Lab",
         "epochs": epochs,
         "lr": lr,
         "criterion": "MSE",
         "optimizer": "Adam",
         "train_num_max": train_num_max,
         "val_num_max": val_num_max,
-        "pretrained": pretrained
+        "pretrained": pretrained,
+        "saved_weight_path": saved_weight_path
     }
 
     train_losses, val_losses = fit(
-        model, train_loader, val_loader, save_dir,
-        criterion, optimizer, device, epochs, lr,
+        model, train_loader, val_loader, saved_weight_path,
+        criterion, optimizer, device, epochs,
         train_batch_size, val_batch_size,
         train_num_max, val_num_max,
         use_wandb, wandb_proj_name, wandb_config

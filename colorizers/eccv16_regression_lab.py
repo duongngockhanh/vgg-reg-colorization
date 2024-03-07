@@ -68,10 +68,7 @@ class ECCV_Regression_Lab(BaseColor):
         model8+=[nn.ReLU(True),]
         model8+=[nn.Conv2d(256, 256, kernel_size=3, stride=1, padding=1, bias=True),]
         model8+=[nn.ReLU(True),]
-
         model8+=[nn.Conv2d(256, 2, kernel_size=1, stride=1, padding=0, bias=True),]
-        model8+=[nn.Conv2d(2, 2, kernel_size=3, stride=1, padding=1, bias=True),]
-        model8+=[nn.Tanh(),]
 
         self.model1 = nn.Sequential(*model1)
         self.model2 = nn.Sequential(*model2)
@@ -82,6 +79,7 @@ class ECCV_Regression_Lab(BaseColor):
         self.model7 = nn.Sequential(*model7)
         self.model8 = nn.Sequential(*model8)
         self.upsample4 = nn.Upsample(scale_factor=4, mode='bilinear')
+        self.tanh = nn.Tanh()
 
     def forward(self, input_l):
         input_l = self.model1(self.normalize_l(input_l))
@@ -92,4 +90,6 @@ class ECCV_Regression_Lab(BaseColor):
         input_l = self.model6(input_l)
         input_l = self.model7(input_l)
         input_l = self.model8(input_l)
-        return self.unnormalize_ab(self.upsample4(input_l))
+        input_l = self.upsample4(input_l)
+        input_l = self.tanh(input_l)
+        return self.unnormalize_ab(input_l)
