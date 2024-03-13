@@ -81,8 +81,8 @@ class ECCVGenerator(BaseColor):
         self.model8 = nn.Sequential(*model8)
 
         self.softmax = nn.Softmax(dim=1)
-        self.model_out = nn.Conv2d(313, 2, kernel_size=1, padding=0, dilation=1, stride=1, bias=False)
-        self.upsample4 = nn.Upsample(scale_factor=4, mode='bilinear')
+        # self.model_out = nn.Conv2d(313, 2, kernel_size=1, padding=0, dilation=1, stride=1, bias=False)
+        # self.upsample4 = nn.Upsample(scale_factor=4, mode='bilinear')
 
     def forward(self, input_l):
         conv1_2 = self.model1(self.normalize_l(input_l))

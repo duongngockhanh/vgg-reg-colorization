@@ -1,7 +1,3 @@
-import sys
-del sys.modules['colorizers']
-del sys.modules['dataloaders']
-
 import wandb
 import time
 import torch
@@ -158,7 +154,7 @@ def main():
 
     # Use WanDB
     use_wandb = True 
-    wandb_proj_name = "zhang-reg-norm-lab-03"
+    wandb_proj_name = "zhang-reg-norm-lab-13"
     wandb_config = {
         "dataset": "coco-stuff",
         "model": "ECCV_Regression_Lab",
@@ -179,3 +175,6 @@ def main():
         train_num_max, val_num_max,
         use_wandb, wandb_proj_name, wandb_config
     )
+
+if __name__ == "__main__":
+    main()

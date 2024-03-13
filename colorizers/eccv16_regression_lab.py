@@ -80,6 +80,7 @@ class ECCV_Regression_Lab(BaseColor):
         self.model8 = nn.Sequential(*model8)
         self.upsample4 = nn.Upsample(scale_factor=4, mode='bilinear')
         self.tanh = nn.Tanh()
+        
 
     def forward(self, input_l):
         input_l = self.model1(self.normalize_l(input_l))
