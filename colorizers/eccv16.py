@@ -102,4 +102,12 @@ def eccv16(pretrained=True):
 	if(pretrained):
 		import torch.utils.model_zoo as model_zoo
 		model.load_state_dict(model_zoo.load_url('https://colorizers.s3.us-east-2.amazonaws.com/colorization_release_v2-9b330a0b.pth',map_location='cpu',check_hash=True))
+		model.load_state_dict(state_dict)
+        	torch.save(model.state_dict(), 'eccv16_pretrained.pth')
 	return model
+
+if __name__ == "__main__":
+    model = ECCVGenerator()
+    model.load_state_dict(torch.load("eccv16_pretrained.pth"))
+    extractor = nn.Sequential(*list(model.children())[:-4])
+    summary(extractor, (1, 224, 224))
